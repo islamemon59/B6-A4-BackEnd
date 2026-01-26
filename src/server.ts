@@ -1,12 +1,12 @@
 import app from "./app";
+import config from "./config";
 import { prisma } from "./lib/prisma";
-const port = process.env.PORT || 5000;
 
 const main = async () => {
   try {
     await prisma.$connect();
-    app.listen(port, () => {
-      console.log(`Example app listening on port ${port}`);
+    app.listen(config.port, () => {
+      console.log(`Example app listening on port ${config.port}`);
     });
   } catch (error) {
     console.error(error)
