@@ -7,6 +7,8 @@ app.use(cors({
     credentials: true,
 }))
 
+app.use(express.json())
+
 app.get('/', (req, res) => {
   res.send('Server working perfectly🙂')
 })
