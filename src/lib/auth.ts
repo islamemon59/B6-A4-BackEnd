@@ -4,7 +4,26 @@ import { prisma } from "./prisma";
 // If your Prisma file is located elsewhere, you can change the path
 
 export const auth = betterAuth({
-    database: prismaAdapter(prisma, {
-        provider: "postgresql", // or "mysql", "postgresql", ...etc
-    }),
+  database: prismaAdapter(prisma, {
+    provider: "postgresql", // or "mysql", "postgresql", ...etc
+  }),
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        defaultValue: "USER",
+        required: false,
+      },
+      status: {
+        type: "string",
+        defaultValue: "UNBAN",
+        required: false,
+      },
+    },
+  },
+  emailAndPassword: {
+    enabled: true,
+    autoSignIn: false,
+    requireEmailVerification: false,
+  },
 });
