@@ -1,0 +1,52 @@
+model Booking {
+    id String @id @default(uuid())
+
+    studentId      String
+    tutorProfileId String
+    tutorProfile   TutorProfile @relation(fields: [tutorProfileId], references: [id], onDelete: Cascade)
+
+    // optional but useful for filtering + historical snapshot
+    categoryId String?
+    category   Category? @relation(fields: [categoryId], references: [id])
+
+    availabilitySlotId String?           @unique
+    availabilitySlot   AvailabilitySlot? @relation(fields: [availabilitySlotId], references: [id], onDelete: SetNull)
+
+    subject   String // snapshot: what student booked for
+    startTime DateTime
+    endTime   DateTime
+
+    status       BookingStatus @default(CONFIRMED)
+    cancelledBy  CancelledBy?
+    cancelReason String?
+
+    meetingLink      String?
+    notesFromStudent String?
+    notesFromTutor   String?
+
+    isReviewed Boolean @default(false)
+    review     Review?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([studentId])
+    @@index([tutorProfileId])
+    @@index([status])
+    @@index([startTime])
+    @@map("bookings")
+}
+
+enum BookingStatus {
+    CONFIRMED
+    COMPLETED
+    CANCELLED
+}
+
+
+
+enum CancelledBy {
+    STUDENT
+    TUTOR
+    ADMIN
+}
