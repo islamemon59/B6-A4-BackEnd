@@ -11,25 +11,17 @@ model Category {
     @@map("categories")
 }
 
-
-
 model AvailabilitySlot {
     id String @id @default(uuid())
 
     tutorProfileId String
     tutorProfile   TutorProfile @relation(fields: [tutorProfileId], references: [id], onDelete: Cascade)
-
-    startTime DateTime
-    endTime   DateTime
-
-    isBooked Boolean @default(false)
-
-    // optional: store timezone if you want future-proof time handling
-    timezone String? // e.g. "Asia/Dhaka"
-
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    booking   Booking?
+    startTime      DateTime
+    endTime        DateTime
+    isBooked       Boolean      @default(false)
+    createdAt      DateTime     @default(now())
+    updatedAt      DateTime     @updatedAt
+    booking        Booking?
 
     @@index([tutorProfileId])
     @@index([startTime])

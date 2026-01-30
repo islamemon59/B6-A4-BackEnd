@@ -3,15 +3,19 @@ import { tutorServices } from "./tutor.service";
 
 const createProfile = async (req: Request, res: Response) => {
   try {
-    const result = await tutorServices.createProfile();
+    const user = req.user;
+    if (!user) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Unauthorized access" });
+    }
+    const result = await tutorServices.createProfile(req.body, user.id as string);
 
-    res
-      .status(201)
-      .json({
-        success: true,
-        message: "Profile successfully created",
-        data: result,
-      });
+    res.status(201).json({
+      success: true,
+      message: "Profile successfully created",
+      data: result,
+    });
   } catch (error: any) {
     res.status(404).json({ success: false, message: error.message });
   }

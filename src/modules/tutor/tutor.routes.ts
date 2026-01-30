@@ -1,10 +1,13 @@
 import { Router } from "express";
 import { tutorController } from "./tutor.controller";
-import authMiddleware from "../../middleware/middleware";
-import { UserRole } from "../../types";
+import authMiddleware, { UserRole } from "../../middleware/middleware";
 
-const router =  Router();
+const router = Router();
 
-router.post("/tutor/profile", authMiddleware(UserRole.TUTOR), tutorController.createProfile)
+router.post(
+  "/tutor/profile",
+  authMiddleware(UserRole.TUTOR),
+  tutorController.createProfile,
+);
 
 export const tutorRouter = router;

@@ -14,11 +14,6 @@ declare global{
   }
 }
 
-enum UserRole {
-  STUDENT= "STUDENT",
-  TUTOR = "TUTOR",
-  ADMIN = "ADMIN",
-}
 
 enum UserStatus {
   BAN,
