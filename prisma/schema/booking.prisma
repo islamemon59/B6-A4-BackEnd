@@ -20,10 +20,6 @@ model Booking {
     cancelledBy  CancelledBy?
     cancelReason String?
 
-    meetingLink      String?
-    notesFromStudent String?
-    notesFromTutor   String?
-
     isReviewed Boolean @default(false)
     review     Review?
 

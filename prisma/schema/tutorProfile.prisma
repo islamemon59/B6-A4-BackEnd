@@ -7,6 +7,8 @@ model TutorProfile {
     about             String
     subjects          String[]
     meetingMode       MeetingMode        @default(ONLINE)
+    hourlyRate        Float
+    currency          String             @default("BDT")
     ratingCount       Int                @default(0)
     isFeatured        Boolean            @default(false)
     profileStatus     ProfileStatus      @default(DRAFT)
