@@ -1,9 +1,23 @@
 import { boolean, email } from "better-auth/*";
 
+declare global{
+  namespace Express{
+    interface Request{
+      user?: {
+        id: string;
+        name: string;
+        email: string;
+        role: string;
+        emailVerified: boolean;
+      }
+    }
+  }
+}
+
 enum UserRole {
-  STUDENT,
-  TUTOR,
-  ADMIN,
+  STUDENT= "STUDENT",
+  TUTOR = "TUTOR",
+  ADMIN = "ADMIN",
 }
 
 enum UserStatus {
