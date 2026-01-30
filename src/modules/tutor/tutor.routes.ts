@@ -10,4 +10,10 @@ router.post(
   tutorController.createProfile,
 );
 
+router.patch(
+  "/tutor/:profileId",
+  authMiddleware(UserRole.TUTOR),
+  tutorController.updateProfile,
+);
+
 export const tutorRouter = router;

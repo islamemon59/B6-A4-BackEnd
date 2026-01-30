@@ -1,4 +1,4 @@
-import { TutorProfile } from "../../../generated/prisma/browser";
+import { TutorProfile } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 
 const createProfile = async (
@@ -16,7 +16,6 @@ const createProfile = async (
   >,
   id: string,
 ) => {
-    console.log({payload, id});
   return await prisma.tutorProfile.create({
     data: {
       ...payload,
@@ -25,6 +24,16 @@ const createProfile = async (
   });
 };
 
+const updateProfile = async (payload: Partial<TutorProfile>, id: string) => {
+  return await prisma.tutorProfile.update({
+    where: {
+      id,
+    },
+    data: payload,
+  });
+};
+
 export const tutorServices = {
   createProfile,
+  updateProfile,
 };
