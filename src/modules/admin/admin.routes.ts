@@ -10,6 +10,19 @@ router.get(
   adminController.getAllUsers,
 );
 
+router.get(
+  "/categories/:categoryId",
+  authMiddleware(UserRole.ADMIN),
+  adminController.getSingleCategory,
+);
+
+router.get(
+  "/categories",
+  authMiddleware(UserRole.ADMIN),
+  adminController.getAllCategories,
+);
+
+
 router.post(
   "/categories",
   authMiddleware(UserRole.ADMIN),
@@ -20,6 +33,11 @@ router.patch(
   "/update-status/:userId",
   authMiddleware(UserRole.ADMIN),
   adminController.updateUserStatus,
+);
+router.patch(
+  "/categories/:categoryId",
+  authMiddleware(UserRole.ADMIN),
+  adminController.updateCategory,
 );
 
 export const adminRouter = router;

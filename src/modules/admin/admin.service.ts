@@ -31,8 +31,32 @@ const updateUserStatus = async (status: string, id: string) => {
   });
 };
 
+const getAllCategories = async () => {
+  return await prisma.category.findMany();
+};
+
+const updateCategory = async (payload: Partial<Category>, id: string) => {
+  return await prisma.category.update({
+    where: {
+      id,
+    },
+    data: payload,
+  });
+};
+
+const getSingleCategory = async (id: string) => {
+  return await prisma.category.findUnique({
+    where: {
+      id,
+    },
+  });
+};
+
 export const adminServices = {
   createCategory,
   getAllUsers,
   updateUserStatus,
+  getAllCategories,
+  updateCategory,
+  getSingleCategory,
 };
