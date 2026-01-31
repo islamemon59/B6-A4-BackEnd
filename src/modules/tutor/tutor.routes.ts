@@ -10,6 +10,8 @@ router.post(
   tutorController.createProfile,
 );
 
+router.post("/tutor/availability", authMiddleware(UserRole.TUTOR), tutorController.setAvailability)
+
 router.patch(
   "/tutor/:profileId",
   authMiddleware(UserRole.TUTOR),

@@ -12,7 +12,7 @@ model Booking {
     availabilitySlotId String?           @unique
     availabilitySlot   AvailabilitySlot? @relation(fields: [availabilitySlotId], references: [id], onDelete: SetNull)
 
-    subject   String // snapshot: what student booked for
+    subject   String 
     startTime DateTime
     endTime   DateTime
 

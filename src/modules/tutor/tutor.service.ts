@@ -1,4 +1,7 @@
-import { TutorProfile } from "../../../generated/prisma/client";
+import {
+  AvailabilitySlot,
+  TutorProfile,
+} from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 
 const createProfile = async (
@@ -33,7 +36,29 @@ const updateProfile = async (payload: Partial<TutorProfile>, id: string) => {
   });
 };
 
+const setAvailability = async (
+  payload: Omit<AvailabilitySlot, "id" | "createdAt" | "updatedAt">,
+  id: string,
+) => {
+  const tutorProfile = await prisma.tutorProfile.findFirstOrThrow({
+    where: {
+      userId: id,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  return await prisma.availabilitySlot.create({
+    data: {
+      ...payload,
+      tutorProfileId: tutorProfile.id,
+    },
+  });
+};
+
 export const tutorServices = {
   createProfile,
   updateProfile,
+  setAvailability,
 };

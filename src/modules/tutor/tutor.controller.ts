@@ -49,7 +49,31 @@ const updateProfile = async (req: Request, res: Response) => {
   }
 };
 
+const setAvailability = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Unauthorized access" });
+    }
+    const result = await tutorServices.setAvailability(
+      req.body,
+      user.id as string,
+    );
+
+    res.status(201).json({
+      success: true,
+      message: "Availability slot Added",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(404).json({ success: false, message: error.message });
+  }
+};
+
 export const tutorController = {
   createProfile,
   updateProfile,
+  setAvailability,
 };
