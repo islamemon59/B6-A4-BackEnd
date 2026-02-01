@@ -10,4 +10,14 @@ router.post(
   studentController.bookSession,
 );
 
+router.patch(
+  "/users/me",
+  authMiddleware(
+    UserRole.ADMIN,
+    UserRole.STUDENT,
+    UserRole.TUTOR,
+    UserRole.USER,
+  ), studentController.updateProfile
+);
+
 export const studentRouter = router;

@@ -4,7 +4,8 @@ import { auth } from "../lib/auth";
 export enum UserRole {
     STUDENT = "STUDENT",
     ADMIN = "ADMIN",
-    TUTOR = "TUTOR"
+    TUTOR = "TUTOR",
+    USER = "USER"
 }
 
 const authMiddleware = (...roles: UserRole[]) => {

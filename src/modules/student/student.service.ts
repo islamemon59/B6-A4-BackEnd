@@ -32,12 +32,12 @@ const bookSession = async (
         throw new Error("Slot does not belong to this tutor");
       }
 
-      if (
-        slot.startTime.getTime() !== new Date(payload.startTime).getTime() ||
-        slot.endTime.getTime() !== new Date(payload.endTime).getTime()
-      ) {
-        throw new Error("Booking time must match the slot time");
-      }
+      //   if (
+      //     slot.startTime.getTime() !== new Date(payload.startTime).getTime() ||
+      //     slot.endTime.getTime() !== new Date(payload.endTime).getTime()
+      //   ) {
+      //     throw new Error("Booking time must match the slot time");
+      //   }
 
       const booking = await tx.booking.create({
         data: {
@@ -61,6 +61,30 @@ const bookSession = async (
   }
 };
 
+const updateProfile = async (
+  userId: string,
+  payload: { name: string; image: string },
+) => {
+  return await prisma.user.update({
+    where: { id: userId },
+    data: {
+      ...(payload.name && { name: payload.name }),
+      ...(payload.image && { image: payload.image }),
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      status: true,
+      image: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+};
+
 export const studentServices = {
   bookSession,
+  updateProfile,
 };

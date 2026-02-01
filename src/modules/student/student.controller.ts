@@ -11,15 +11,7 @@ const bookSession = async (req: Request, res: Response) => {
         .json({ success: false, message: "Unauthorized access" });
     }
 
-    // ✅ Basic required fields check
-    const {
-      tutorProfileId,
-      subject,
-      startTime,
-      endTime,
-      availabilitySlotId,
-      categoryId,
-    } = req.body;
+    const { tutorProfileId, subject, startTime, endTime } = req.body;
 
     if (!tutorProfileId || !subject || !startTime || !endTime) {
       return res.status(400).json({
@@ -28,7 +20,6 @@ const bookSession = async (req: Request, res: Response) => {
       });
     }
 
-    // ✅ Parse dates
     const parsedStart = new Date(startTime);
     const parsedEnd = new Date(endTime);
 
@@ -58,6 +49,44 @@ const bookSession = async (req: Request, res: Response) => {
   }
 };
 
+const updateProfile = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+
+    if (!user) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Unauthorized access" });
+    }
+
+    const { name, image } = req.body;
+
+    if (!name && !image) {
+      return res.status(400).json({
+        success: false,
+        message: "Nothing to update",
+      });
+    }
+
+    const updatedUser = await studentServices.updateProfile(user.id, {
+      name,
+      image,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      data: updatedUser,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Server error",
+    });
+  }
+};
+
 export const studentController = {
   bookSession,
+  updateProfile,
 };
