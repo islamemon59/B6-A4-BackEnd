@@ -27,10 +27,18 @@ const createProfile = async (
   });
 };
 
+const getProfile = async (id: string) => {
+  return await prisma.tutorProfile.findUnique({
+    where: {
+      userId: id,
+    },
+  });
+};
+
 const updateProfile = async (payload: Partial<TutorProfile>, id: string) => {
   return await prisma.tutorProfile.update({
     where: {
-      id,
+      userId: id,
     },
     data: payload,
   });
@@ -115,6 +123,7 @@ const deleteAvailability = async (id: string, slotId: string) => {
 
 export const tutorServices = {
   createProfile,
+  getProfile,
   updateProfile,
   setAvailability,
   updateAvailability,

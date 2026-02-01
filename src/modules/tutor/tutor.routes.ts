@@ -10,6 +10,12 @@ router.get(
   tutorController.allAvailabilitySlot,
 );
 
+router.get(
+  "/tutor/profile",
+  authMiddleware(UserRole.TUTOR),
+  tutorController.getProfile,
+);
+
 router.post(
   "/tutor/create-profile",
   authMiddleware(UserRole.TUTOR),
@@ -29,7 +35,7 @@ router.patch(
 );
 
 router.patch(
-  "/tutor/:profileId",
+  "/tutor/update-profile",
   authMiddleware(UserRole.TUTOR),
   tutorController.updateProfile,
 );

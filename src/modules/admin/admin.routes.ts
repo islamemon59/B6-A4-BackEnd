@@ -18,7 +18,7 @@ router.get(
 
 router.get(
   "/categories",
-  authMiddleware(UserRole.ADMIN),
+  authMiddleware(),
   adminController.getAllCategories,
 );
 

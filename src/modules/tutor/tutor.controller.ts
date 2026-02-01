@@ -25,9 +25,28 @@ const createProfile = async (req: Request, res: Response) => {
   }
 };
 
+const getProfile = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Unauthorized access" });
+    }
+    const result = await tutorServices.getProfile(user.id as string);
+
+    res.status(201).json({
+      success: true,
+      message: "Profile retrieved successfully",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(404).json({ success: false, message: error.message });
+  }
+};
+
 const updateProfile = async (req: Request, res: Response) => {
   try {
-    const { profileId } = req.params;
     const user = req.user;
     if (!user) {
       return res
@@ -37,7 +56,7 @@ const updateProfile = async (req: Request, res: Response) => {
 
     const result = await tutorServices.updateProfile(
       req.body,
-      profileId as string,
+      user.id as string,
     );
 
     res.status(201).json({
@@ -154,9 +173,10 @@ const deleteAvailability = async (req: Request, res: Response) => {
 
 export const tutorController = {
   createProfile,
+  getProfile,
   updateProfile,
   setAvailability,
   updateAvailability,
   deleteAvailability,
-  allAvailabilitySlot
+  allAvailabilitySlot,
 };
