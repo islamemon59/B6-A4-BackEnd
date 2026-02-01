@@ -4,20 +4,40 @@ import authMiddleware, { UserRole } from "../../middleware/middleware";
 
 const router = Router();
 
+router.get(
+  "/tutor/all-slot",
+  authMiddleware(UserRole.TUTOR),
+  tutorController.allAvailabilitySlot,
+);
+
 router.post(
-  "/tutor/profile",
+  "/tutor/create-profile",
   authMiddleware(UserRole.TUTOR),
   tutorController.createProfile,
 );
 
-router.post("/tutor/availability", authMiddleware(UserRole.TUTOR), tutorController.setAvailability)
+router.post(
+  "/tutor/create-slot",
+  authMiddleware(UserRole.TUTOR),
+  tutorController.setAvailability,
+);
 
-router.patch("/tutor/:availabilityId", authMiddleware(UserRole.TUTOR), tutorController.updateAvailability)
+router.patch(
+  "/tutor/update-slot/:slotId",
+  authMiddleware(UserRole.TUTOR),
+  tutorController.updateAvailability,
+);
 
 router.patch(
   "/tutor/:profileId",
   authMiddleware(UserRole.TUTOR),
   tutorController.updateProfile,
+);
+
+router.delete(
+  "/tutor/delete-slot/:slotId",
+  authMiddleware(UserRole.TUTOR),
+  tutorController.deleteAvailability,
 );
 
 export const tutorRouter = router;

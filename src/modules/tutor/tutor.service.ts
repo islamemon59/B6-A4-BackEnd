@@ -57,10 +57,27 @@ const setAvailability = async (
   });
 };
 
+const allAvailabilitySlot = async (id: string) => {
+  const tutorProfile = await prisma.tutorProfile.findFirstOrThrow({
+    where: {
+      userId: id,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  return await prisma.availabilitySlot.findMany({
+    where: {
+      tutorProfileId: tutorProfile.id,
+    },
+  });
+};
+
 const updateAvailability = async (
   payload: Partial<AvailabilitySlot>,
   id: string,
-  availabilityId: string,
+  slotId: string,
 ) => {
   await prisma.tutorProfile.findFirstOrThrow({
     where: {
@@ -73,9 +90,26 @@ const updateAvailability = async (
 
   return await prisma.availabilitySlot.update({
     where: {
-      id: availabilityId,
+      id: slotId,
     },
     data: payload,
+  });
+};
+
+const deleteAvailability = async (id: string, slotId: string) => {
+  await prisma.tutorProfile.findFirstOrThrow({
+    where: {
+      userId: id,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  return await prisma.availabilitySlot.delete({
+    where: {
+      id: slotId,
+    },
   });
 };
 
@@ -84,4 +118,6 @@ export const tutorServices = {
   updateProfile,
   setAvailability,
   updateAvailability,
+  deleteAvailability,
+  allAvailabilitySlot,
 };

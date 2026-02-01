@@ -73,16 +73,36 @@ const setAvailability = async (req: Request, res: Response) => {
   }
 };
 
-const updateAvailability = async (req: Request, res: Response) => {
+const allAvailabilitySlot = async (req: Request, res: Response) => {
   try {
-    const { availabilityId } = req.params;
     const user = req.user;
     if (!user) {
       return res
         .status(401)
         .json({ success: false, message: "Unauthorized access" });
     }
-    if (!availabilityId) {
+    const result = await tutorServices.allAvailabilitySlot(user.id);
+
+    res.status(200).json({
+      success: true,
+      message: "Retrieved availability slot",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(404).json({ success: false, message: error.message });
+  }
+};
+
+const updateAvailability = async (req: Request, res: Response) => {
+  try {
+    const { slotId } = req.params;
+    const user = req.user;
+    if (!user) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Unauthorized access" });
+    }
+    if (!slotId) {
       return res
         .status(404)
         .json({ success: false, message: "Invalid availability id" });
@@ -90,7 +110,7 @@ const updateAvailability = async (req: Request, res: Response) => {
     const result = await tutorServices.updateAvailability(
       req.body,
       user.id as string,
-      availabilityId as string,
+      slotId as string,
     );
 
     res.status(200).json({
@@ -103,9 +123,40 @@ const updateAvailability = async (req: Request, res: Response) => {
   }
 };
 
+const deleteAvailability = async (req: Request, res: Response) => {
+  try {
+    const { slotId } = req.params;
+    const user = req.user;
+    if (!user) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Unauthorized access" });
+    }
+    if (!slotId) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Invalid availability id" });
+    }
+    const result = await tutorServices.deleteAvailability(
+      user.id as string,
+      slotId as string,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Availability slot Deleted",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(404).json({ success: false, message: error.message });
+  }
+};
+
 export const tutorController = {
   createProfile,
   updateProfile,
   setAvailability,
   updateAvailability,
+  deleteAvailability,
+  allAvailabilitySlot
 };
