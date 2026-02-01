@@ -52,6 +52,14 @@ const getSingleCategory = async (id: string) => {
   });
 };
 
+const deleteCategory = async (id: string) => {
+  return await prisma.category.delete({
+    where: {
+      id,
+    },
+  });
+};
+
 export const adminServices = {
   createCategory,
   getAllUsers,
@@ -59,4 +67,5 @@ export const adminServices = {
   getAllCategories,
   updateCategory,
   getSingleCategory,
+  deleteCategory,
 };

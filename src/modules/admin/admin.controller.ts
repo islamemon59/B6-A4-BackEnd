@@ -101,11 +101,31 @@ const getSingleCategory = async (req: Request, res: Response) => {
   }
 };
 
+const deleteCategory = async (req: Request, res: Response) => {
+  try {
+    const { categoryId } = req.params;
+    if (!categoryId) {
+      return res.json({ success: false, message: "Input valid category id" });
+    }
+    const result = await adminServices.deleteCategory(
+      categoryId as string,
+    );
+    res.status(201).json({
+      success: true,
+      message: "Category deleted successfully",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(404).json({ success: false, message: error.message });
+  }
+};
+
 export const adminController = {
   createCategory,
   getAllUsers,
   updateUserStatus,
   getAllCategories,
   updateCategory,
-  getSingleCategory
+  getSingleCategory,
+  deleteCategory
 };

@@ -34,10 +34,17 @@ router.patch(
   authMiddleware(UserRole.ADMIN),
   adminController.updateUserStatus,
 );
+
 router.patch(
   "/categories/:categoryId",
   authMiddleware(UserRole.ADMIN),
   adminController.updateCategory,
+);
+
+router.delete(
+  "/categories/:categoryId",
+  authMiddleware(UserRole.ADMIN),
+  adminController.deleteCategory,
 );
 
 export const adminRouter = router;
