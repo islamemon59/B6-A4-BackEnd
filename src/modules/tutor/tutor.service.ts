@@ -57,8 +57,31 @@ const setAvailability = async (
   });
 };
 
+const updateAvailability = async (
+  payload: Partial<AvailabilitySlot>,
+  id: string,
+  availabilityId: string,
+) => {
+  await prisma.tutorProfile.findFirstOrThrow({
+    where: {
+      userId: id,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  return await prisma.availabilitySlot.update({
+    where: {
+      id: availabilityId,
+    },
+    data: payload,
+  });
+};
+
 export const tutorServices = {
   createProfile,
   updateProfile,
   setAvailability,
+  updateAvailability,
 };

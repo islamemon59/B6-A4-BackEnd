@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { tutorServices } from "./tutor.service";
+import { success } from "better-auth/*";
 
 const createProfile = async (req: Request, res: Response) => {
   try {
@@ -72,8 +73,39 @@ const setAvailability = async (req: Request, res: Response) => {
   }
 };
 
+const updateAvailability = async (req: Request, res: Response) => {
+  try {
+    const { availabilityId } = req.params;
+    const user = req.user;
+    if (!user) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Unauthorized access" });
+    }
+    if (!availabilityId) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Invalid availability id" });
+    }
+    const result = await tutorServices.updateAvailability(
+      req.body,
+      user.id as string,
+      availabilityId as string,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Availability slot updated",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(404).json({ success: false, message: error.message });
+  }
+};
+
 export const tutorController = {
   createProfile,
   updateProfile,
   setAvailability,
+  updateAvailability,
 };
