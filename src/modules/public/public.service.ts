@@ -11,7 +11,7 @@ type TutorQuery = {
   minRating?: string;
   minPrice?: string;
   maxPrice?: string;
-orderBy?: string;
+  orderBy?: string;
   sortBy?: SortBy;
   sortOrder?: SortOrder;
 
@@ -84,8 +84,8 @@ const getAllTutors = async (query: TutorQuery) => {
     sortBy === "price"
       ? { hourlyRate: sortOrder }
       : sortBy === "rating"
-      ? { ratingAvg: sortOrder } // requires ratingAvg field
-      : { createdAt: "desc" };
+        ? { ratingAvg: sortOrder } // requires ratingAvg field
+        : { createdAt: sortOrder };
 
   // ✅ list + count together
   const [data, total] = await prisma.$transaction([
@@ -114,13 +114,29 @@ const getAllTutors = async (query: TutorQuery) => {
 
 const getFeaturedTutor = async () => {
   return await prisma.tutorProfile.findMany({
-    where:{
-      isFeatured: true
-    }
-  })
-}
+    where: {
+      isFeatured: true,
+    },
+    include: {
+      category: true,
+    },
+    take: 6,
+  });
+};
+
+const getSingleTutor = async (id: string) => {
+  return await prisma.tutorProfile.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      category: true,
+    },
+  });
+};
 
 export const publicServices = {
-    getAllTutors,
-    getFeaturedTutor,
-}
+  getAllTutors,
+  getFeaturedTutor,
+  getSingleTutor,
+};
