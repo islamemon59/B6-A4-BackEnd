@@ -19,4 +19,22 @@ const getAllTutors = async (req: Request, res: Response) => {
   }
 };
 
-export const publicController = { getAllTutors };
+const getFeaturedTutor = async (req: Request, res: Response) => {
+  try {
+    const result = await publicServices.getFeaturedTutor();
+
+    res.status(200).json({
+      success: true,
+      message: "Featured tutor fetched successfully",
+      meta: result.meta,
+      data: result.data,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || "Server error",
+    });
+  }
+}
+
+export const publicController = { getAllTutors, getFeaturedTutor };

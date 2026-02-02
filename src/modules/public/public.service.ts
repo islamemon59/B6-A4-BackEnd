@@ -8,7 +8,7 @@ type TutorQuery = {
   subject?: string;
   categoryId?: string;
 
-  minRating?: string; // number in query
+  minRating?: string;
   minPrice?: string;
   maxPrice?: string;
 orderBy?: string;
@@ -112,7 +112,15 @@ const getAllTutors = async (query: TutorQuery) => {
   };
 };
 
+const getFeaturedTutor = async () => {
+  return await prisma.tutorProfile.findMany({
+    where:{
+      isFeatured: true
+    }
+  })
+}
 
 export const publicServices = {
     getAllTutors,
+    getFeaturedTutor,
 }
