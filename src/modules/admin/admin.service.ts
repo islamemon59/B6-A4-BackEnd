@@ -16,6 +16,16 @@ const getAllUsers = async () => {
   return await prisma.user.findMany();
 };
 
+const getAllBookings = async () => {
+  return await prisma.booking.findMany({
+    include: {
+      category: true,
+      tutorProfile: true,
+      availabilitySlot: true
+    }
+  });
+};
+
 const updateUserStatus = async (status: string, id: string) => {
   const allowed = ["BAN", "UNBAN"];
   if (!status || typeof status !== "string" || !allowed.includes(status)) {
@@ -63,6 +73,7 @@ const deleteCategory = async (id: string) => {
 export const adminServices = {
   createCategory,
   getAllUsers,
+  getAllBookings,
   updateUserStatus,
   getAllCategories,
   updateCategory,

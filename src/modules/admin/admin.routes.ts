@@ -5,44 +5,49 @@ import { adminController } from "./admin.controller";
 const router = Router();
 
 router.get(
-  "/users",
+  "/admin/users",
   authMiddleware(UserRole.ADMIN),
   adminController.getAllUsers,
 );
 
 router.get(
-  "/categories/:categoryId",
+  "/admin/bookings",
+  authMiddleware(UserRole.ADMIN),
+  adminController.getAllBookings,
+);
+
+router.get(
+  "/admin/categories/:categoryId",
   authMiddleware(UserRole.ADMIN),
   adminController.getSingleCategory,
 );
 
 router.get(
-  "/categories",
+  "/admin/categories",
   authMiddleware(),
   adminController.getAllCategories,
 );
 
-
 router.post(
-  "/categories",
+  "/admin/categories",
   authMiddleware(UserRole.ADMIN),
   adminController.createCategory,
 );
 
 router.patch(
-  "/update-status/:userId",
+  "/admin/update-status/:userId",
   authMiddleware(UserRole.ADMIN),
   adminController.updateUserStatus,
 );
 
 router.patch(
-  "/categories/:categoryId",
+  "/admin/categories/:categoryId",
   authMiddleware(UserRole.ADMIN),
   adminController.updateCategory,
 );
 
 router.delete(
-  "/categories/:categoryId",
+  "/admin/categories/:categoryId",
   authMiddleware(UserRole.ADMIN),
   adminController.deleteCategory,
 );

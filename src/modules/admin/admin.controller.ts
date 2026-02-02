@@ -27,6 +27,23 @@ const getAllUsers = async (req: Request, res: Response) => {
   }
 };
 
+const getAllBookings = async (req: Request, res: Response) => {
+  try {
+    const result = await adminServices.getAllBookings();
+
+    return res.status(200).json({
+      success: true,
+      message: "Bookings fetched successfully",
+      data: result,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Server error",
+    });
+  }
+};
+
 const updateUserStatus = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
@@ -88,9 +105,7 @@ const getSingleCategory = async (req: Request, res: Response) => {
     if (!categoryId) {
       return res.json({ success: false, message: "Input valid category id" });
     }
-    const result = await adminServices.getSingleCategory(
-      categoryId as string,
-    );
+    const result = await adminServices.getSingleCategory(categoryId as string);
     res.status(201).json({
       success: true,
       message: "Category retrieved successfully",
@@ -107,9 +122,7 @@ const deleteCategory = async (req: Request, res: Response) => {
     if (!categoryId) {
       return res.json({ success: false, message: "Input valid category id" });
     }
-    const result = await adminServices.deleteCategory(
-      categoryId as string,
-    );
+    const result = await adminServices.deleteCategory(categoryId as string);
     res.status(201).json({
       success: true,
       message: "Category deleted successfully",
@@ -123,9 +136,10 @@ const deleteCategory = async (req: Request, res: Response) => {
 export const adminController = {
   createCategory,
   getAllUsers,
+  getAllBookings,
   updateUserStatus,
   getAllCategories,
   updateCategory,
   getSingleCategory,
-  deleteCategory
+  deleteCategory,
 };
