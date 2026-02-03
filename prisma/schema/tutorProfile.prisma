@@ -11,7 +11,7 @@ model TutorProfile {
     currency          String             @default("BDT")
     ratingCount       Int                @default(0)
     isFeatured        Boolean            @default(false)
-    profileStatus     ProfileStatus      @default(DRAFT)
+    profileStatus     ProfileStatus      @default(PUBLISHED)
     availabilitySlots AvailabilitySlot[]
     bookingsAsTutor   Booking[]
     reviews           Review[]

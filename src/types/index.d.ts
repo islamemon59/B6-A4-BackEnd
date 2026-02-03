@@ -19,3 +19,10 @@ enum UserStatus {
   BAN,
   UNBAN,
 }
+
+
+type CreateBookingPayload = {
+  tutorProfileId: string;
+  availabilitySlotId: string;
+  subject: string;
+};

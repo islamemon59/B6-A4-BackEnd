@@ -86,7 +86,46 @@ const updateProfile = async (req: Request, res: Response) => {
   }
 };
 
+const getAllTutors = async (req: Request, res: Response) => {
+  try {
+    const result = await studentServices.getAllTutors();
+    res.status(200).json({
+      success: true,
+      message: "Tutors retrieved successfully",
+      data: result,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Server error",
+    });
+  }
+};
+
+const createBooking = async (req: Request, res: Response) => {
+  try {
+    const studentId = (req as any).user?.id;
+    const payload = req.body;
+
+    const result = await studentServices.createBooking(studentId, payload);
+    return res
+      .status(201)
+      .json({
+        success: true,
+        message: "Booking successfully created",
+        data: result,
+      });
+  } catch (err: any) {
+    return res.status(400).json({
+      success: false,
+      message: err?.message || "Failed to create booking",
+    });
+  }
+};
+
 export const studentController = {
   bookSession,
   updateProfile,
+  getAllTutors,
+  createBooking,
 };

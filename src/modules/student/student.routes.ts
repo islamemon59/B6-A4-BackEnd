@@ -10,6 +10,18 @@ router.post(
   studentController.bookSession,
 );
 
+router.get(
+  "/student/all-tutor",
+  authMiddleware(UserRole.STUDENT),
+  studentController.getAllTutors,
+);
+
+router.post(
+  "/student/create-booking",
+  authMiddleware(UserRole.STUDENT),
+  studentController.createBooking,
+);
+
 router.patch(
   "/users/me",
   authMiddleware(
@@ -17,7 +29,8 @@ router.patch(
     UserRole.STUDENT,
     UserRole.TUTOR,
     UserRole.USER,
-  ), studentController.updateProfile
+  ),
+  studentController.updateProfile,
 );
 
 export const studentRouter = router;
