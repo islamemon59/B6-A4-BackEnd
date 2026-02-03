@@ -46,21 +46,51 @@ const updateProfile = async (payload: Partial<TutorProfile>, id: string) => {
 
 const setAvailability = async (
   payload: Omit<AvailabilitySlot, "id" | "createdAt" | "updatedAt">,
-  id: string,
+  userId: string,
 ) => {
-  const tutorProfile = await prisma.tutorProfile.findFirstOrThrow({
+  const { startTime, endTime } = payload;
+
+  if (!startTime || !endTime) {
+    throw new Error("Start time and end time are required");
+  }
+
+  const start = new Date(startTime);
+  const end = new Date(endTime);
+
+  if (start >= end) {
+    throw new Error("End time must be after start time");
+  }
+
+  const tutorProfile = await prisma.tutorProfile.findUnique({
+    where: { userId },
+  });
+
+  if (!tutorProfile) {
+    throw new Error("Tutor profile not found");
+  }
+
+  const overlapping = await prisma.availabilitySlot.findFirst({
     where: {
-      userId: id,
-    },
-    select: {
-      id: true,
+      tutorProfileId: tutorProfile.id,
+      isBooked: false,
+      OR: [
+        {
+          startTime: { lt: end },
+          endTime: { gt: start },
+        },
+      ],
     },
   });
 
-  return await prisma.availabilitySlot.create({
+  if (overlapping) {
+    throw new Error("This time slot overlaps with an existing slot");
+  }
+
+  return prisma.availabilitySlot.create({
     data: {
-      ...payload,
       tutorProfileId: tutorProfile.id,
+      startTime: start,
+      endTime: end,
     },
   });
 };

@@ -131,6 +131,10 @@ const getSingleTutor = async (id: string) => {
     },
     include: {
       category: true,
+      availabilitySlots: true,
+      reviews:{
+        orderBy: { createdAt: "desc" },
+      }
     },
   });
 };

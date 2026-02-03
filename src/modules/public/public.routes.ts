@@ -3,7 +3,7 @@ import { publicController } from "./public.controller";
 
 const router = Router()
 
-router.get("/", publicController.getAllTutors)
+router.get("/public/all-tutor", publicController.getAllTutors)
 
 router.get("/public/tutor/:tutorId", publicController.getSingleTutor)
 
