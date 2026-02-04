@@ -23,7 +23,7 @@ router.get(
 );
 
 router.get(
-  "/reviews",
+  "/tutor/reviews",
   authMiddleware(UserRole.TUTOR),
   tutorController.getMyReviews,
 );
