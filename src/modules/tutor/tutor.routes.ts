@@ -16,6 +16,30 @@ router.get(
   tutorController.getProfile,
 );
 
+router.get(
+  "/tutor/sessions",
+  authMiddleware(UserRole.TUTOR),
+  tutorController.getMySessions,
+);
+
+router.get(
+  "/reviews",
+  authMiddleware(UserRole.TUTOR),
+  tutorController.getMyReviews,
+);
+
+router.patch(
+  "/tutor/sessions/complete/:bookingId",
+  authMiddleware(UserRole.TUTOR),
+  tutorController.markSessionCompleted,
+);
+
+router.patch(
+  "/tutor/sessions/cancel/:bookingId",
+  authMiddleware(UserRole.TUTOR),
+  tutorController.cancelSession,
+);
+
 router.post(
   "/tutor/create-profile",
   authMiddleware(UserRole.TUTOR),

@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { tutorServices } from "./tutor.service";
-import { success } from "better-auth/*";
 
 const createProfile = async (req: Request, res: Response) => {
   try {
@@ -171,6 +170,78 @@ const deleteAvailability = async (req: Request, res: Response) => {
   }
 };
 
+const getMySessions = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.id;
+
+    const data = await tutorServices.getMySessions(userId);
+
+    return res.status(200).json({ success: true, data });
+  } catch (err: any) {
+    return res.status(400).json({
+      success: false,
+      message: err?.message || "Failed to load sessions",
+    });
+  }
+};
+
+const markSessionCompleted = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.id;
+    const { bookingId } = req.params;
+
+    const data = await tutorServices.markSessionCompleted(
+      userId,
+      bookingId as string,
+    );
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Session marked as completed", data });
+  } catch (err: any) {
+    return res.status(400).json({
+      success: false,
+      message: err?.message || "Failed to complete session",
+    });
+  }
+};
+
+const cancelSession = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.id;
+    const { bookingId } = req.params;
+    const { reason } = req.body;
+
+    const data = await tutorServices.cancelSession(
+      userId,
+      bookingId as string,
+      reason,
+    );
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Session cancelled", data });
+  } catch (err: any) {
+    return res.status(400).json({
+      success: false,
+      message: err?.message || "Failed to cancel session",
+    });
+  }
+};
+
+const getMyReviews = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.id;
+    const data = await tutorServices.getMyReviews(userId);
+    return res.status(200).json({ success: true, data });
+  } catch (err: any) {
+    return res.status(400).json({
+      success: false,
+      message: err?.message || "Failed to load reviews",
+    });
+  }
+};
+
 export const tutorController = {
   createProfile,
   getProfile,
@@ -179,4 +250,8 @@ export const tutorController = {
   updateAvailability,
   deleteAvailability,
   allAvailabilitySlot,
+  getMySessions,
+  markSessionCompleted,
+  cancelSession,
+  getMyReviews,
 };
