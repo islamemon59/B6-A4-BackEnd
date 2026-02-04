@@ -1,6 +1,7 @@
 import { Router } from "express";
 import authMiddleware, { UserRole } from "../../middleware/middleware";
 import { studentController } from "./student.controller";
+import { studentServices } from "./student.service";
 
 const router = Router();
 
@@ -16,10 +17,28 @@ router.get(
   studentController.getAllTutors,
 );
 
+router.get(
+  "/student/my-bookings",
+  authMiddleware(UserRole.STUDENT),
+  studentController.getMyBookings,
+);
+
 router.post(
   "/student/create-booking",
   authMiddleware(UserRole.STUDENT),
   studentController.createBooking,
+);
+
+router.post(
+  "/student/create-review",
+  authMiddleware(UserRole.STUDENT),
+  studentController.createReview,
+);
+
+router.patch(
+  "/student/cancel-booking/:bookingId",
+  authMiddleware(UserRole.STUDENT),
+  studentController.cancelBooking,
 );
 
 router.patch(

@@ -26,3 +26,9 @@ type CreateBookingPayload = {
   availabilitySlotId: string;
   subject: string;
 };
+
+type CreateReviewPayload = {
+  bookingId: string;
+  rating: number;
+  comment?: string;
+};

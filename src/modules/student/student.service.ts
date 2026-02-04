@@ -1,6 +1,6 @@
 import { Booking } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
-import { CreateBookingPayload } from "../../types";
+import { CreateBookingPayload, CreateReviewPayload } from "../../types";
 
 const bookSession = async (
   payload: Omit<
@@ -170,9 +170,134 @@ const createBooking = async (
   });
 };
 
+const getMyBookings = async (studentId: string) => {
+  if (!studentId) throw new Error("Unauthorized");
+
+  return await prisma.booking.findMany({
+    where: { studentId },
+    orderBy: { startTime: "desc" },
+    include: {
+      tutorProfile: {
+        select: {
+          id: true,
+          headline: true,
+          hourlyRate: true,
+          currency: true,
+          meetingMode: true,
+          subjects: true,
+          category: { select: { id: true, name: true } },
+        },
+      },
+      availabilitySlot: true,
+    },
+  });
+};
+
+const cancelBooking = async (
+  studentId: string,
+  bookingId: string,
+  reason?: string,
+) => {
+  if (!studentId) throw new Error("Unauthorized");
+  if (!bookingId) throw new Error("bookingId is required");
+
+  return await prisma.$transaction(async (tx) => {
+    const booking = await tx.booking.findFirst({
+      where: { id: bookingId, studentId },
+      select: {
+        id: true,
+        status: true,
+        availabilitySlotId: true,
+        startTime: true,
+      },
+    });
+
+    if (!booking) throw new Error("Booking not found");
+    if (booking.status === "CANCELLED")
+      throw new Error("Booking already cancelled");
+
+    // Optional rule: prevent cancelling past bookings
+    if (new Date(booking.startTime).getTime() < Date.now()) {
+      throw new Error("You can’t cancel a booking that already started");
+    }
+
+    const updated = await tx.booking.update({
+      where: { id: bookingId },
+      data: {
+        status: "CANCELLED",
+        cancelledBy: "STUDENT",
+        cancelReason: reason || null,
+      },
+    });
+
+    // Free the slot again (only if you want this behavior)
+    if (booking.availabilitySlotId) {
+      await tx.availabilitySlot.update({
+        where: { id: booking.availabilitySlotId },
+        data: { isBooked: false },
+      });
+    }
+
+    return updated;
+  });
+};
+
+const createReview = async (
+  studentId: string,
+  payload: CreateReviewPayload,
+) => {
+  if (!studentId) throw new Error("Unauthorized");
+
+  const { bookingId, rating, comment } = payload;
+
+  if (!bookingId) throw new Error("bookingId is required");
+  if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+    throw new Error("rating must be an integer between 1 and 5");
+  }
+
+  return await prisma.$transaction(async (tx) => {
+    const booking = await tx.booking.findFirst({
+      where: { id: bookingId, studentId },
+      select: {
+        id: true,
+        status: true,
+        isReviewed: true,
+        tutorProfileId: true,
+      },
+    });
+
+    if (!booking) throw new Error("Booking not found");
+    if (booking.status !== "COMPLETED") {
+      throw new Error("You can review only after the session is completed.");
+    }
+    if (booking.isReviewed)
+      throw new Error("This booking is already reviewed.");
+
+    const review = await tx.review.create({
+      data: {
+        bookingId,
+        studentId,
+        tutorProfileId: booking.tutorProfileId,
+        rating,
+        comment: comment?.trim() || null,
+      },
+    });
+
+    await tx.booking.update({
+      where: { id: bookingId },
+      data: { isReviewed: true },
+    });
+
+    return review;
+  });
+};
+
 export const studentServices = {
   bookSession,
   updateProfile,
   getAllTutors,
   createBooking,
+  getMyBookings,
+  cancelBooking,
+  createReview,
 };

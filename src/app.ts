@@ -6,6 +6,7 @@ import { tutorRouter } from "./modules/tutor/tutor.routes";
 import { adminRouter } from "./modules/admin/admin.routes";
 import { studentRouter } from "./modules/student/student.routes";
 import { publicRouter } from "./modules/public/public.routes";
+import { startBookingAutoCompleteJob } from "./modules/bookings/booking.schedule";
 const app = express();
 
 app.use(
@@ -23,6 +24,8 @@ app.use("/api", tutorRouter);
 app.use("/api", adminRouter);
 app.use("/api", studentRouter);
 app.use("/api", publicRouter);
+
+startBookingAutoCompleteJob();
 
 app.get("/", (req, res) => {
   res.send("Server working perfectly🙂");
