@@ -99,9 +99,7 @@ const updateCategory = async (req: Request, res: Response) => {
 
 const getSingleCategory = async (req: Request, res: Response) => {
   try {
-    console.log("hello");
     const { categoryId } = req.params;
-    console.log(categoryId);
     if (!categoryId) {
       return res.json({ success: false, message: "Input valid category id" });
     }

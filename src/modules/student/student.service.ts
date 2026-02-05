@@ -33,13 +33,6 @@ const bookSession = async (
         throw new Error("Slot does not belong to this tutor");
       }
 
-      //   if (
-      //     slot.startTime.getTime() !== new Date(payload.startTime).getTime() ||
-      //     slot.endTime.getTime() !== new Date(payload.endTime).getTime()
-      //   ) {
-      //     throw new Error("Booking time must match the slot time");
-      //   }
-
       const booking = await tx.booking.create({
         data: {
           studentId,
@@ -160,7 +153,6 @@ const createBooking = async (
       },
     });
 
-    // 4) mark slot booked
     await tx.availabilitySlot.update({
       where: { id: availabilitySlotId },
       data: { isBooked: true },
@@ -216,7 +208,6 @@ const cancelBooking = async (
     if (booking.status === "CANCELLED")
       throw new Error("Booking already cancelled");
 
-    // Optional rule: prevent cancelling past bookings
     if (new Date(booking.startTime).getTime() < Date.now()) {
       throw new Error("You can’t cancel a booking that already started");
     }
@@ -230,7 +221,6 @@ const cancelBooking = async (
       },
     });
 
-    // Free the slot again (only if you want this behavior)
     if (booking.availabilitySlotId) {
       await tx.availabilitySlot.update({
         where: { id: booking.availabilitySlotId },

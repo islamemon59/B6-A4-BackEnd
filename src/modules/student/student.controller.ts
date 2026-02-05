@@ -134,12 +134,11 @@ const createBooking = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    // ✅ Prisma unique constraint error (slot already booked)
     if (
       err instanceof Prisma.PrismaClientKnownRequestError &&
       err.code === "P2002"
     ) {
-      // optional: check field name
+      
       const target = (err.meta as any)?.target;
 
       if (Array.isArray(target) && target.includes("availabilitySlotId")) {

@@ -2,7 +2,6 @@ import cron from "node-cron";
 import { prisma } from "../../lib/prisma";
 
 export function startBookingAutoCompleteJob() {
-  // every 5 minutes
   cron.schedule("*/5 * * * *", async () => {
     try {
       const now = new Date();

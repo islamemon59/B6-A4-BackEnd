@@ -20,37 +20,32 @@ type TutorQuery = {
 };
 
 const getAllTutors = async (query: TutorQuery) => {
-  // ✅ pagination (recommended)
   const page = Math.max(1, Number(query.page || 1));
   const limit = Math.min(50, Math.max(1, Number(query.limit || 10)));
   const skip = (page - 1) * limit;
 
-  // ✅ build WHERE
+
   const where: any = {
-    profileStatus: "PUBLISHED", // only show published tutors
+    profileStatus: "PUBLISHED",
   };
 
-  // category filter
+
   if (query.categoryId) {
     where.categoryId = query.categoryId;
   }
 
-  // subject filter (array contains)
+ 
   if (query.subject) {
     where.subjects = { has: query.subject };
   }
 
-  // rating filter (min)
   if (query.minRating) {
     const r = Number(query.minRating);
     if (!Number.isNaN(r)) {
-      // If you store ratingAvg use that instead.
-      // You currently have ratingCount only; most apps store ratingAvg too.
       where.ratingAvg = { gte: r };
     }
   }
 
-  // price range
   if (query.minPrice || query.maxPrice) {
     where.hourlyRate = {};
     if (query.minPrice) {
@@ -63,20 +58,18 @@ const getAllTutors = async (query: TutorQuery) => {
     }
   }
 
-  // search across headline/about + subjects
   if (query.q) {
     const q = query.q.trim();
     if (q) {
       where.OR = [
         { headline: { contains: q, mode: "insensitive" } },
         { about: { contains: q, mode: "insensitive" } },
-        // subjects array search (Postgres only supports string[] contains via has/hasSome)
-        { subjects: { has: q } }, // if someone searches "React"
+        
+        { subjects: { has: q } },
       ];
     }
   }
 
-  // ✅ sorting
   const sortBy: SortBy = query.sortBy || "latest";
   const sortOrder: SortOrder = query.sortOrder || "desc";
 
@@ -84,10 +77,9 @@ const getAllTutors = async (query: TutorQuery) => {
     sortBy === "price"
       ? { hourlyRate: sortOrder }
       : sortBy === "rating"
-        ? { ratingAvg: sortOrder } // requires ratingAvg field
+        ? { ratingAvg: sortOrder }
         : { createdAt: sortOrder };
 
-  // ✅ list + count together
   const [data, total] = await prisma.$transaction([
     prisma.tutorProfile.findMany({
       where,

@@ -23,7 +23,7 @@ router.get(
 );
 
 router.get(
-  "/admin/categories",
+  "/categories",
   authMiddleware(),
   adminController.getAllCategories,
 );

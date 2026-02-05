@@ -197,7 +197,6 @@ const markSessionCompleted = async (userId: string, bookingId: string) => {
   if (booking.status === "CANCELLED")
     throw new Error("Cancelled session cannot be completed");
 
-  // Optional rule: only after session end
   if (new Date(booking.endTime).getTime() > Date.now()) {
     throw new Error("You can complete the session only after it ends");
   }
@@ -238,7 +237,6 @@ const cancelSession = async (
     },
   });
 
-  // Optional: free slot again
   if (booking.availabilitySlotId) {
     await prisma.availabilitySlot.update({
       where: { id: booking.availabilitySlotId },
