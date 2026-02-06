@@ -5,7 +5,6 @@ model Booking {
     tutorProfileId String
     tutorProfile   TutorProfile @relation(fields: [tutorProfileId], references: [id], onDelete: Cascade)
 
-    // optional but useful for filtering + historical snapshot
     categoryId String?
     category   Category? @relation(fields: [categoryId], references: [id])
 
