@@ -264,7 +264,14 @@ var auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql"
   }),
-  trustedOrigins: [process.env.APP_URL],
+  cookies: {
+    secure: true,
+    sameSite: "none"
+  },
+  trustedOrigins: [
+    process.env.APP_URL,
+    "https://your-vercel-app.vercel.app"
+  ],
   user: {
     additionalFields: {
       role: {
@@ -1701,6 +1708,7 @@ function startBookingAutoCompleteJob() {
 
 // src/app.ts
 var app = express();
+app.use(express.json());
 app.use(
   cors({
     origin: process.env.APP_URL || "http://localhost:3000",
@@ -1708,7 +1716,6 @@ app.use(
   })
 );
 app.all("/api/auth/*splat", toNodeHandler(auth));
-app.use(express.json());
 app.use("/api", tutorRouter);
 app.use("/api", adminRouter);
 app.use("/api", studentRouter);
