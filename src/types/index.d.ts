@@ -32,3 +32,5 @@ type CreateReviewPayload = {
   rating: number;
   comment?: string;
 };
+
+export type { CreateBookingPayload, CreateReviewPayload } from "./student";

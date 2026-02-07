@@ -1,6 +1,7 @@
 import { Booking } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
-import { CreateBookingPayload, CreateReviewPayload } from "../../types";
+import type { CreateBookingPayload, CreateReviewPayload } from "../../../types";
+
 
 const bookSession = async (
   payload: Omit<
