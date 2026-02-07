@@ -7,15 +7,13 @@ export const auth = betterAuth({
     provider: "postgresql",
   }),
   cookies: {
-  secure: true,
-  sameSite: "none",
-},
+    sessionToken: {
+      sameSite: "none",
+      secure: true,
+    },
+  },
 
-  trustedOrigins: [
-  process.env.APP_URL!,
-  "https://your-vercel-app.vercel.app",
-],
-
+  trustedOrigins: [process.env.APP_URL!, "https://your-vercel-app.vercel.app"],
 
   user: {
     additionalFields: {
