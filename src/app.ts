@@ -12,7 +12,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: process.env.APP_URL || "http://localhost:3000",
+    origin: process.env.APP_URL || "https://b6-a4-front-end.vercel.app",
     credentials: true,
   }),
 );
