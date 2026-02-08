@@ -2,18 +2,22 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma";
 
+const trustedOrigins = [
+  process.env.APP_URL,
+  "https://b6-a4-front-end.vercel.app",
+].filter(Boolean) as string[];
+
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
+  trustedOrigins,
   cookies: {
     sessionToken: {
       sameSite: "none",
       secure: true,
     },
   },
-
-  trustedOrigins: [process.env.APP_URL!, "https://your-vercel-app.vercel.app"],
 
   user: {
     additionalFields: {

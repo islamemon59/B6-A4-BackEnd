@@ -260,17 +260,21 @@ var adapter = new PrismaPg({ connectionString });
 var prisma = new PrismaClient({ adapter });
 
 // src/lib/auth.ts
+var trustedOrigins = [
+  process.env.APP_URL,
+  "https://b6-a4-front-end.vercel.app"
+].filter(Boolean);
 var auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql"
   }),
+  trustedOrigins,
   cookies: {
     sessionToken: {
       sameSite: "none",
       secure: true
     }
   },
-  trustedOrigins: [process.env.APP_URL, "https://your-vercel-app.vercel.app"],
   user: {
     additionalFields: {
       role: {
@@ -1710,7 +1714,7 @@ var app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: process.env.APP_URL || "http://localhost:3000",
+    origin: process.env.APP_URL || "https://b6-a4-front-end.vercel.app",
     credentials: true
   })
 );
