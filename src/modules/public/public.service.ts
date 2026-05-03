@@ -19,22 +19,52 @@ type TutorQuery = {
   limit?: string;
 };
 
+const tutorCardSelect = {
+  id: true,
+  userId: true,
+  headline: true,
+  about: true,
+  subjects: true,
+  meetingMode: true,
+  hourlyRate: true,
+  currency: true,
+  ratingAvg: true,
+  ratingCount: true,
+  isFeatured: true,
+  profileStatus: true,
+  createdAt: true,
+  updatedAt: true,
+  categoryId: true,
+  category: {
+    select: {
+      id: true,
+      name: true,
+      description: true,
+    },
+  },
+  user: {
+    select: {
+      id: true,
+      name: true,
+      image: true,
+      email: true,
+    },
+  },
+} as const;
+
 const getAllTutors = async (query: TutorQuery) => {
   const page = Math.max(1, Number(query.page || 1));
   const limit = Math.min(50, Math.max(1, Number(query.limit || 10)));
   const skip = (page - 1) * limit;
 
-
   const where: any = {
     profileStatus: "PUBLISHED",
   };
-
 
   if (query.categoryId) {
     where.categoryId = query.categoryId;
   }
 
- 
   if (query.subject) {
     where.subjects = { has: query.subject };
   }
@@ -86,9 +116,7 @@ const getAllTutors = async (query: TutorQuery) => {
       skip,
       take: limit,
       orderBy,
-      include: {
-        category: { select: { id: true, name: true } },
-      },
+      select: tutorCardSelect,
     }),
     prisma.tutorProfile.count({ where }),
   ]);
@@ -108,31 +136,134 @@ const getFeaturedTutor = async () => {
   return await prisma.tutorProfile.findMany({
     where: {
       isFeatured: true,
+      profileStatus: "PUBLISHED",
     },
-    include: {
-      category: true,
-    },
+    select: tutorCardSelect,
     take: 6,
+    orderBy: [{ ratingAvg: "desc" }, { createdAt: "desc" }],
   });
 };
 
 const getSingleTutor = async (id: string) => {
-  return await prisma.tutorProfile.findUnique({
+  const tutor = await prisma.tutorProfile.findUnique({
     where: {
       id,
     },
     include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          image: true,
+          email: true,
+        },
+      },
       category: true,
-      availabilitySlots: true,
-      reviews:{
+      availabilitySlots: {
+        orderBy: { startTime: "asc" },
+      },
+      reviews: {
+        include: {
+          student: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+        },
         orderBy: { createdAt: "desc" },
-      }
+      },
     },
   });
+
+  if (!tutor) {
+    return null;
+  }
+
+  const relatedTutors = await prisma.tutorProfile.findMany({
+    where: {
+      profileStatus: "PUBLISHED",
+      categoryId: tutor.categoryId,
+      id: { not: tutor.id },
+    },
+    select: tutorCardSelect,
+    take: 4,
+    orderBy: [{ ratingAvg: "desc" }, { createdAt: "desc" }],
+  });
+
+  return {
+    ...tutor,
+    relatedTutors,
+  };
+};
+
+const getPublicCategories = async () => {
+  return prisma.category.findMany({
+    where: {
+      isActive: true,
+    },
+    orderBy: { name: "asc" },
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      _count: {
+        select: {
+          tutorProfiles: true,
+        },
+      },
+    },
+  });
+};
+
+const getHomeMetrics = async () => {
+  const [tutors, categories, completedBookings, featuredTutors, rating] =
+    await Promise.all([
+      prisma.tutorProfile.count({
+        where: {
+          profileStatus: "PUBLISHED",
+        },
+      }),
+      prisma.category.count({
+        where: {
+          isActive: true,
+        },
+      }),
+      prisma.booking.count({
+        where: {
+          status: "COMPLETED",
+        },
+      }),
+      prisma.tutorProfile.count({
+        where: {
+          isFeatured: true,
+          profileStatus: "PUBLISHED",
+        },
+      }),
+      prisma.tutorProfile.aggregate({
+        where: {
+          profileStatus: "PUBLISHED",
+        },
+        _avg: {
+          ratingAvg: true,
+        },
+      }),
+    ]);
+
+  return {
+    tutors,
+    categories,
+    completedBookings,
+    featuredTutors,
+    averageRating: Number((rating._avg.ratingAvg || 0).toFixed(1)),
+  };
 };
 
 export const publicServices = {
   getAllTutors,
   getFeaturedTutor,
   getSingleTutor,
+  getPublicCategories,
+  getHomeMetrics,
 };

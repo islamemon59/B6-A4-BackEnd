@@ -38,12 +38,12 @@ const getFeaturedTutor = async (req: Request, res: Response) => {
 
 const getSingleTutor = async (req: Request, res: Response) => {
   try {
-    const {tutorId} = req.params;
+    const { tutorId } = req.params;
     const result = await publicServices.getSingleTutor(tutorId as string);
 
     res.status(200).json({
       success: true,
-      message: "Featured tutor fetched successfully",
+      message: "Tutor fetched successfully",
       data: result,
     });
   } catch (error: any) {
@@ -54,4 +54,44 @@ const getSingleTutor = async (req: Request, res: Response) => {
   }
 };
 
-export const publicController = { getAllTutors, getFeaturedTutor, getSingleTutor };
+const getPublicCategories = async (req: Request, res: Response) => {
+  try {
+    const result = await publicServices.getPublicCategories();
+
+    res.status(200).json({
+      success: true,
+      message: "Categories fetched successfully",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || "Server error",
+    });
+  }
+};
+
+const getHomeMetrics = async (req: Request, res: Response) => {
+  try {
+    const result = await publicServices.getHomeMetrics();
+
+    res.status(200).json({
+      success: true,
+      message: "Home metrics fetched successfully",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || "Server error",
+    });
+  }
+};
+
+export const publicController = {
+  getAllTutors,
+  getFeaturedTutor,
+  getSingleTutor,
+  getPublicCategories,
+  getHomeMetrics,
+};

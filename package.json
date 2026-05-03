@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "npx tsx watch ./src/server.ts",
     "admin": "npx tsx ./src/scripts/seedAdmin.ts",
+    "seed:demo": "npx tsx ./src/scripts/seedDemo.ts",
     "build": "tsup src/server.ts --format esm --platform node --out-dir dist",
     "start": "node dist/server.mjs",
     "postinstall": "prisma generate"

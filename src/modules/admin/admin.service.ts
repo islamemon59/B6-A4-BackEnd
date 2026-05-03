@@ -13,16 +13,38 @@ const createCategory = async (
 };
 
 const getAllUsers = async () => {
-  return await prisma.user.findMany();
+  return await prisma.user.findMany({
+    orderBy: { createdAt: "desc" },
+  });
 };
 
 const getAllBookings = async () => {
   return await prisma.booking.findMany({
+    orderBy: { createdAt: "desc" },
     include: {
       category: true,
-      tutorProfile: true,
-      availabilitySlot: true
-    }
+      student: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+      tutorProfile: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              image: true,
+            },
+          },
+          category: true,
+        },
+      },
+      availabilitySlot: true,
+    },
   });
 };
 
@@ -42,7 +64,17 @@ const updateUserStatus = async (status: string, id: string) => {
 };
 
 const getAllCategories = async () => {
-  return await prisma.category.findMany();
+  return await prisma.category.findMany({
+    orderBy: { name: "asc" },
+    include: {
+      _count: {
+        select: {
+          tutorProfiles: true,
+          bookings: true,
+        },
+      },
+    },
+  });
 };
 
 const updateCategory = async (payload: Partial<Category>, id: string) => {

@@ -7,6 +7,24 @@ const trustedOrigins = [
   "https://b6-a4-front-end.vercel.app",
 ].filter(Boolean) as string[];
 
+const socialProviders: Record<string, any> = {};
+
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  socialProviders.google = {
+    clientId: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    accessType: "offline",
+    prompt: "select_account consent",
+  };
+}
+
+if (process.env.FACEBOOK_CLIENT_ID && process.env.FACEBOOK_CLIENT_SECRET) {
+  socialProviders.facebook = {
+    clientId: process.env.FACEBOOK_CLIENT_ID,
+    clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+  };
+}
+
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
@@ -53,12 +71,5 @@ export const auth = betterAuth({
     autoSignIn: false,
     requireEmailVerification: false,
   },
-  socialProviders: {
-    google: {
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-      accessType: "offline",
-      prompt: "select_account consent",
-    },
-  },
+  socialProviders,
 });

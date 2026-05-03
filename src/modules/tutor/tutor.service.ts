@@ -44,6 +44,22 @@ const getProfile = async (id: string) => {
     where: {
       userId: id,
     },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+        },
+      },
+      category: true,
+      availabilitySlots: {
+        orderBy: {
+          startTime: "asc",
+        },
+      },
+    },
   });
 };
 
@@ -179,6 +195,14 @@ const getMySessions = async (userId: string) => {
       status: true,
       isReviewed: true,
       studentId: true,
+      student: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+        },
+      },
       cancelReason: true,
       createdAt: true,
     },
@@ -266,6 +290,13 @@ const getMyReviews = async (userId: string) => {
         },
       },
       studentId: true,
+      student: {
+        select: {
+          id: true,
+          name: true,
+          image: true,
+        },
+      },
     },
   });
 };

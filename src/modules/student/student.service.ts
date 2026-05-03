@@ -2,6 +2,26 @@ import { Booking } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 import type { CreateBookingPayload, CreateReviewPayload } from "../../../types";
 
+const syncTutorRating = async (
+  tx: typeof prisma,
+  tutorProfileId: string,
+) => {
+  const aggregate = await tx.review.aggregate({
+    where: { tutorProfileId },
+    _avg: { rating: true },
+    _count: { id: true },
+  });
+
+  await tx.tutorProfile.update({
+    where: { id: tutorProfileId },
+    data: {
+      ratingAvg: aggregate._avg.rating
+        ? Number(aggregate._avg.rating.toFixed(1))
+        : 0,
+      ratingCount: aggregate._count.id,
+    },
+  });
+};
 
 const bookSession = async (
   payload: Omit<
@@ -81,9 +101,24 @@ const updateProfile = async (
 
 const getAllTutors = async () => {
   return await prisma.tutorProfile.findMany({
+    where: {
+      profileStatus: "PUBLISHED",
+    },
+    orderBy: [{ isFeatured: "desc" }, { ratingAvg: "desc" }, { createdAt: "desc" }],
     include: {
       category: true,
-      availabilitySlots: true,
+      user: {
+        select: {
+          id: true,
+          name: true,
+          image: true,
+        },
+      },
+      availabilitySlots: {
+        orderBy: {
+          startTime: "asc",
+        },
+      },
     },
   });
 };
@@ -144,10 +179,19 @@ const createBooking = async (
             headline: true,
             hourlyRate: true,
             currency: true,
+            ratingAvg: true,
+            ratingCount: true,
             meetingMode: true,
             subjects: true,
             userId: true,
-            category: { select: { id: true, name: true } },
+            user: {
+              select: {
+                id: true,
+                name: true,
+                image: true,
+              },
+            },
+            category: { select: { id: true, name: true, description: true } },
           },
         },
         availabilitySlot: true,
@@ -176,9 +220,18 @@ const getMyBookings = async (studentId: string) => {
           headline: true,
           hourlyRate: true,
           currency: true,
+          ratingAvg: true,
+          ratingCount: true,
           meetingMode: true,
           subjects: true,
-          category: { select: { id: true, name: true } },
+          user: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+          category: { select: { id: true, name: true, description: true } },
         },
       },
       availabilitySlot: true,
@@ -278,6 +331,8 @@ const createReview = async (
       where: { id: bookingId },
       data: { isReviewed: true },
     });
+
+    await syncTutorRating(tx, booking.tutorProfileId);
 
     return review;
   });

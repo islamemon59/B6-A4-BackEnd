@@ -1,6 +1,7 @@
 model TutorProfile {
     id                String             @id @default(uuid())
     userId            String             @unique
+    user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
     categoryId        String
     category          Category           @relation(fields: [categoryId], references: [id])
     headline          String
@@ -9,6 +10,7 @@ model TutorProfile {
     meetingMode       MeetingMode        @default(ONLINE)
     hourlyRate        Float
     currency          String             @default("BDT")
+    ratingAvg         Float              @default(0)
     ratingCount       Int                @default(0)
     isFeatured        Boolean            @default(false)
     profileStatus     ProfileStatus      @default(PUBLISHED)

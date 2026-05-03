@@ -10,6 +10,9 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  tutorProfile  TutorProfile?
+  studentBookings Booking[] @relation("StudentBookings")
+  studentReviews Review[] @relation("StudentReviews")
 
   @@unique([email])
   @@map("user")

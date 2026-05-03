@@ -2,6 +2,7 @@ model Booking {
     id String @id @default(uuid())
 
     studentId      String
+    student        User         @relation("StudentBookings", fields: [studentId], references: [id], onDelete: Cascade)
     tutorProfileId String
     tutorProfile   TutorProfile @relation(fields: [tutorProfileId], references: [id], onDelete: Cascade)
 
