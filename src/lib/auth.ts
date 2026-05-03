@@ -4,7 +4,9 @@ import { prisma } from "./prisma";
 
 const trustedOrigins = [
   process.env.APP_URL,
+  process.env.PROD_APP_URL,
   "https://b6-a4-front-end.vercel.app",
+  "http://localhost:3000",
 ].filter(Boolean) as string[];
 
 const socialProviders: Record<string, any> = {};
