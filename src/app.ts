@@ -14,6 +14,7 @@ app.use(express.json());
 const allowedOrigins = [
   process.env.APP_URL || "https://b6-a4-front-end.vercel.app",
   process.env.PROD_APP_URL, // Production frontend URL
+  "http://localhost:3000",
 ].filter(Boolean); // Remove undefined values
 
 app.use(

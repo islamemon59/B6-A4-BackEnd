@@ -263,6 +263,8 @@ var prisma = new PrismaClient({ adapter });
 
 // src/lib/auth.ts
 var signupRoles = /* @__PURE__ */ new Set(["STUDENT", "TUTOR"]);
+var frontendAuthURL = process.env.APP_URL || process.env.PROD_APP_URL || "http://localhost:3000";
+var useSecureCookies = frontendAuthURL.startsWith("https://");
 function normalizeSignupRole(role) {
   if (typeof role !== "string") {
     return null;
@@ -273,6 +275,7 @@ function normalizeSignupRole(role) {
 var trustedOrigins = [
   process.env.APP_URL,
   process.env.PROD_APP_URL,
+  process.env.BETTER_AUTH_URL,
   "https://b6-a4-front-end.vercel.app",
   "http://localhost:3000"
 ].filter(Boolean);
@@ -287,18 +290,12 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
   };
 }
 var auth = betterAuth({
-  baseURL: process.env.BETTER_AUTH_URL,
+  baseURL: frontendAuthURL,
   secret: process.env.BETTER_AUTH_SECRET,
   database: prismaAdapter(prisma, {
     provider: "postgresql"
   }),
   trustedOrigins,
-  cookies: {
-    sessionToken: {
-      sameSite: "none",
-      secure: true
-    }
-  },
   session: {
     cookieCache: {
       enabled: true,
@@ -308,7 +305,7 @@ var auth = betterAuth({
   },
   advanced: {
     cookiePrefix: "better-auth",
-    useSecureCookies: process.env.NODE_ENV === "production",
+    useSecureCookies,
     crossSubDomainCookies: {
       enabled: false
     },
@@ -2041,8 +2038,9 @@ var app = express();
 app.use(express.json());
 var allowedOrigins = [
   process.env.APP_URL || "https://b6-a4-front-end.vercel.app",
-  process.env.PROD_APP_URL
+  process.env.PROD_APP_URL,
   // Production frontend URL
+  "http://localhost:3000"
 ].filter(Boolean);
 app.use(
   cors({

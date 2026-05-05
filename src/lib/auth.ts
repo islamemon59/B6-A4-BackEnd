@@ -4,6 +4,11 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma";
 
 const signupRoles = new Set(["STUDENT", "TUTOR"]);
+const frontendAuthURL =
+  process.env.APP_URL ||
+  process.env.PROD_APP_URL ||
+  "http://localhost:3000";
+const useSecureCookies = frontendAuthURL.startsWith("https://");
 
 type SocialSignupState = {
   role?: string;
@@ -21,6 +26,7 @@ function normalizeSignupRole(role?: string | null) {
 const trustedOrigins = [
   process.env.APP_URL,
   process.env.PROD_APP_URL,
+  process.env.BETTER_AUTH_URL,
   "https://b6-a4-front-end.vercel.app",
   "http://localhost:3000",
 ].filter(Boolean) as string[];
@@ -38,19 +44,12 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
 }
 
 export const auth = betterAuth({
-  baseURL: process.env.BETTER_AUTH_URL,
+  baseURL: frontendAuthURL,
   secret: process.env.BETTER_AUTH_SECRET,
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
   trustedOrigins,
-  cookies: {
-    sessionToken: {
-      sameSite: "none",
-      secure: true,
-    },
-  },
-
   session: {
     cookieCache: {
       enabled: true,
@@ -59,7 +58,7 @@ export const auth = betterAuth({
   },
   advanced: {
     cookiePrefix: "better-auth",
-    useSecureCookies: process.env.NODE_ENV === "production",
+    useSecureCookies,
     crossSubDomainCookies: {
       enabled: false,
     },
