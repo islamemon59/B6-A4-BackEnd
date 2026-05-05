@@ -1,14 +1,18 @@
+import "dotenv/config";
 import { betterAuth } from "better-auth";
 import { getOAuthState } from "better-auth/api";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma";
 
 const signupRoles = new Set(["STUDENT", "TUTOR"]);
-const frontendAuthURL =
+const isProduction = process.env.NODE_ENV === "production";
+const localBackendURL = `http://localhost:${process.env.PORT || "5000"}`;
+const productionFrontendURL =
   process.env.APP_URL ||
   process.env.PROD_APP_URL ||
-  "http://localhost:3000";
-const useSecureCookies = frontendAuthURL.startsWith("https://");
+  "https://b6-a4-front-end.vercel.app";
+const authBaseURL = isProduction ? productionFrontendURL : localBackendURL;
+const useSecureCookies = isProduction;
 
 type SocialSignupState = {
   role?: string;
@@ -28,7 +32,9 @@ const trustedOrigins = [
   process.env.PROD_APP_URL,
   process.env.BETTER_AUTH_URL,
   "https://b6-a4-front-end.vercel.app",
+  "http://localhost:*",
   "http://localhost:3000",
+  "http://localhost:3001",
 ].filter(Boolean) as string[];
 
 const socialProviders: Record<string, any> = {};
@@ -44,7 +50,7 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
 }
 
 export const auth = betterAuth({
-  baseURL: frontendAuthURL,
+  baseURL: authBaseURL,
   secret: process.env.BETTER_AUTH_SECRET,
   database: prismaAdapter(prisma, {
     provider: "postgresql",

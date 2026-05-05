@@ -5,11 +5,13 @@ var __export = (target, all) => {
 };
 
 // src/app.ts
+import "dotenv/config";
 import express from "express";
 import { toNodeHandler } from "better-auth/node";
 import cors from "cors";
 
 // src/lib/auth.ts
+import "dotenv/config";
 import { betterAuth } from "better-auth";
 import { getOAuthState } from "better-auth/api";
 import { prismaAdapter } from "better-auth/adapters/prisma";
@@ -263,8 +265,11 @@ var prisma = new PrismaClient({ adapter });
 
 // src/lib/auth.ts
 var signupRoles = /* @__PURE__ */ new Set(["STUDENT", "TUTOR"]);
-var frontendAuthURL = process.env.APP_URL || process.env.PROD_APP_URL || "http://localhost:3000";
-var useSecureCookies = frontendAuthURL.startsWith("https://");
+var isProduction = process.env.NODE_ENV === "production";
+var localBackendURL = `http://localhost:${process.env.PORT || "5000"}`;
+var productionFrontendURL = process.env.APP_URL || process.env.PROD_APP_URL || "https://b6-a4-front-end.vercel.app";
+var authBaseURL = isProduction ? productionFrontendURL : localBackendURL;
+var useSecureCookies = isProduction;
 function normalizeSignupRole(role) {
   if (typeof role !== "string") {
     return null;
@@ -277,7 +282,9 @@ var trustedOrigins = [
   process.env.PROD_APP_URL,
   process.env.BETTER_AUTH_URL,
   "https://b6-a4-front-end.vercel.app",
-  "http://localhost:3000"
+  "http://localhost:*",
+  "http://localhost:3000",
+  "http://localhost:3001"
 ].filter(Boolean);
 var socialProviders = {};
 if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
@@ -290,7 +297,7 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
   };
 }
 var auth = betterAuth({
-  baseURL: frontendAuthURL,
+  baseURL: authBaseURL,
   secret: process.env.BETTER_AUTH_SECRET,
   database: prismaAdapter(prisma, {
     provider: "postgresql"
@@ -2040,13 +2047,14 @@ var allowedOrigins = [
   process.env.APP_URL || "https://b6-a4-front-end.vercel.app",
   process.env.PROD_APP_URL,
   // Production frontend URL
-  "http://localhost:3000"
+  "http://localhost:3000",
+  "http://localhost:3001"
 ].filter(Boolean);
 app.use(
   cors({
     origin: (origin, callback) => {
       if (!origin) return callback(null, true);
-      const isAllowed = allowedOrigins.includes(origin) || /^https:\/\/next-blog-client.*\.vercel\.app$/.test(origin) || /^https:\/\/.*\.vercel\.app$/.test(origin);
+      const isAllowed = allowedOrigins.includes(origin) || /^http:\/\/localhost:\d+$/.test(origin) || /^https:\/\/next-blog-client.*\.vercel\.app$/.test(origin) || /^https:\/\/.*\.vercel\.app$/.test(origin);
       if (isAllowed) {
         callback(null, true);
       } else {

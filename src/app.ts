@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import { toNodeHandler } from "better-auth/node";
 import cors from "cors";
@@ -15,6 +16,7 @@ const allowedOrigins = [
   process.env.APP_URL || "https://b6-a4-front-end.vercel.app",
   process.env.PROD_APP_URL, // Production frontend URL
   "http://localhost:3000",
+  "http://localhost:3001",
 ].filter(Boolean); // Remove undefined values
 
 app.use(
@@ -26,6 +28,7 @@ app.use(
       // Check if origin is in allowedOrigins or matches Vercel preview pattern
       const isAllowed =
         allowedOrigins.includes(origin) ||
+        /^http:\/\/localhost:\d+$/.test(origin) ||
         /^https:\/\/next-blog-client.*\.vercel\.app$/.test(origin) ||
         /^https:\/\/.*\.vercel\.app$/.test(origin); // Any Vercel deployment
 
