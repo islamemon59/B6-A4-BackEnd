@@ -11,6 +11,7 @@ import cors from "cors";
 
 // src/lib/auth.ts
 import { betterAuth } from "better-auth";
+import { getOAuthState } from "better-auth/api";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 
 // src/lib/prisma.ts
@@ -261,6 +262,14 @@ var adapter = new PrismaPg({ connectionString });
 var prisma = new PrismaClient({ adapter });
 
 // src/lib/auth.ts
+var signupRoles = /* @__PURE__ */ new Set(["STUDENT", "TUTOR"]);
+function normalizeSignupRole(role) {
+  if (typeof role !== "string") {
+    return null;
+  }
+  const normalizedRole = role.toUpperCase();
+  return signupRoles.has(normalizedRole) ? normalizedRole : null;
+}
 var trustedOrigins = [
   process.env.APP_URL,
   process.env.PROD_APP_URL,
@@ -273,6 +282,7 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
     clientId: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     accessType: "offline",
+    disableImplicitSignUp: true,
     prompt: "select_account consent"
   };
 }
@@ -304,6 +314,25 @@ var auth = betterAuth({
     },
     disableCSRFCheck: true
     // Allow requests without Origin header (Postman, mobile apps, etc.)
+  },
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          const oAuthState = await getOAuthState();
+          const roleFromOAuth = normalizeSignupRole(
+            oAuthState?.role
+          );
+          return {
+            data: {
+              ...user,
+              role: roleFromOAuth ?? user.role ?? "USER",
+              status: typeof user.status === "string" ? user.status : "UNBAN"
+            }
+          };
+        }
+      }
+    }
   },
   user: {
     additionalFields: {

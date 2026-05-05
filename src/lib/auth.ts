@@ -1,6 +1,22 @@
 import { betterAuth } from "better-auth";
+import { getOAuthState } from "better-auth/api";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma";
+
+const signupRoles = new Set(["STUDENT", "TUTOR"]);
+
+type SocialSignupState = {
+  role?: string;
+};
+
+function normalizeSignupRole(role?: string | null) {
+  if (typeof role !== "string") {
+    return null;
+  }
+
+  const normalizedRole = role.toUpperCase();
+  return signupRoles.has(normalizedRole) ? normalizedRole : null;
+}
 
 const trustedOrigins = [
   process.env.APP_URL,
@@ -16,6 +32,7 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
     clientId: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     accessType: "offline",
+    disableImplicitSignUp: true,
     prompt: "select_account consent",
   };
 }
@@ -47,6 +64,26 @@ export const auth = betterAuth({
       enabled: false,
     },
     disableCSRFCheck: true, // Allow requests without Origin header (Postman, mobile apps, etc.)
+  },
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          const oAuthState = await getOAuthState();
+          const roleFromOAuth = normalizeSignupRole(
+            (oAuthState as SocialSignupState | null)?.role,
+          );
+
+          return {
+            data: {
+              ...user,
+              role: roleFromOAuth ?? user.role ?? "USER",
+              status: typeof user.status === "string" ? user.status : "UNBAN",
+            },
+          };
+        },
+      },
+    },
   },
 
   user: {
